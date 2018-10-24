@@ -64,6 +64,31 @@ class Contact_Us{
     private function Validate_Data($firstname, $lastname, $email){
         global $form_error;
         $form_error = new WP_Error();
+
+        if (empty($firstname) || empty($lastname) || empty($email)){
+            $form_error -> add('field', 'Fields shouldn\'t be empty!');
+        }
+
+        if(filter_var($firstname, FILTER_VALIDATE_REGEXP, array("options" => array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+            $form_error -> add('Invalid_FirstName', 'Invalid First Name Entered!');
+        }
+
+        if(filter_var($lastname, FILTER_VALIDATE_REGEXP, array("options" => array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+            $form_error -> add('Invalid_LastName', 'Invalid Last Name Entered!');
+        }
+
+        if (filter_var($email,FILTER_VALIDATE_EMAIL)){
+            $form_error -> add('Invalid_Email','Invalid E-Mail Entered!');
+        }
+
+        if (is_wp_error($form_error)){
+            foreach ($form_error -> get_error_messages() as $error) {
+                echo '<div>';
+                echo '<strong>ERROR</strong>';
+                echo $error. '<br/>';
+                echo '</div>';
+            }
+        }
     }
 
     /** *********** Database handling functions ************* **/
