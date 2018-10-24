@@ -37,7 +37,7 @@ class Contact_Us{
 
     }
 
-    /** *********** Fount End handling functions ************* **/
+    /** *********** Front End handling functions ************* **/
     public static function Create_HTML_Form(){
         echo '<p><h1>Please fill up the form below!</h1></p>';
         echo '
