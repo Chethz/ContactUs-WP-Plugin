@@ -34,11 +34,19 @@ class Contact_Us{
     }
 
     private function Plugin_Run(){
+        $firstname = $_POST['First_Name'];
+        $lastname = $_POST['Last_Name'];
+        $email = $_POST['Email'];
+
+        $this->Validate_Data($firstname,$lastname,$email);
+        if ($this->Search_Duplicate_Data($firstname, $lastname,$email) == true){
+            $this->Save_Input_data($firstname, $lastname, $email);
+        }
 
     }
 
-    /** *********** Front End handling functions ************* **/
-    public static function Create_HTML_Form(){
+    /** *********** Front end handling functions ************* **/
+    public function Create_HTML_Form(){
         echo '<p><h1>Please fill up the form below!</h1></p>';
         echo '
         <form action="' . get_permalink() . '" method="post">
@@ -59,6 +67,10 @@ class Contact_Us{
             </div>
         </form>
         ';
+
+        if (isset($_POST['Submit'])){
+            $this->Plugin_Run();
+        }
     }
 
     private function Validate_Data($firstname, $lastname, $email){
@@ -94,6 +106,7 @@ class Contact_Us{
     /** *********** Database handling functions ************* **/
     private function Create_DB_Table(){
         global $wpdb;
+
         $table_name = $wpdb->prefix . 'contact_form';
 
         if ($wpdb->get_var('SHOW TABLE LIKE' . $table_name) != $table_name) {
@@ -110,12 +123,35 @@ class Contact_Us{
         }
     }
 
-    private function Save_Input_data(){
+    private function Save_Input_data($firstname, $lastname, $email){
+        global $wpdb;
+        $tablename = $wpdb->prefix . 'contact_form';
 
+        $wpdb->insert($tablename, array(
+                'first_name' => $firstname,
+                'last_name' => $lastname,
+                'email' => $email)
+        );
     }
 
-    private function Search_Duplicate_Data(){
+    private function Search_Duplicate_Data($fname, $lname, $email){
+        global $wpdb;
+        global $form_error;
+        $form_error = new WP_Error();
 
+        $table_name = $wpdb->prefix . 'contact_form';
+        $firstname = $fname;
+        $lastname = $lname;
+        $email = $email;
+
+        $result = $wpdb->get_results("SELECT * FROM $table_name WHERE first_name = '".$firstname."' AND last_name = '".$lastname."' AND email = '".$email."'");
+
+        if (count($result) > 0){
+            $form_error->add('Record exists', 'Record already exist!');
+            return false;
+        }else{
+            return true;
+        }
     }
 }
 
