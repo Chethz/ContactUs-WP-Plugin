@@ -33,14 +33,19 @@ class Contact_Us{
 
     }
 
+    /** *********** Main function ************* **/
     private function Plugin_Run(){
-        $firstname = $_POST['First_Name'];
-        $lastname = $_POST['Last_Name'];
-        $email = $_POST['Email'];
+        global $form_error;
 
-        $this->Validate_Data($firstname,$lastname,$email);
-        if ($this->Search_Duplicate_Data($firstname, $lastname,$email) == true){
-            $this->Save_Input_data($firstname, $lastname, $email);
+        $firstname = filter_var(trim($_POST['First_Name']), FILTER_SANITIZE_STRING);
+        $lastname = filter_var(trim($_POST['Last_Name']),FILTER_SANITIZE_STRING);
+        $email = filter_var(trim($_POST['Email']), FILTER_SANITIZE_EMAIL);
+
+        self::Validate_Data($firstname,$lastname,$email);
+        if ( 1 > count( $form_error->get_error_messages() ) ) {
+            if (self::Search_Duplicate_Data($firstname, $lastname, $email) == true) {
+                self::Save_Input_data($firstname, $lastname, $email);
+            }
         }
 
     }
@@ -49,7 +54,7 @@ class Contact_Us{
     public function Create_HTML_Form(){
         echo '<p><h1>Please fill up the form below!</h1></p>';
         echo '
-        <form action="' . get_permalink() . '" method="post">
+        <form method="post">
             <div>
                 <label>First Name</label>
                 <input type="text" name="First_Name" /><br>
@@ -69,34 +74,34 @@ class Contact_Us{
         ';
 
         if (isset($_POST['Submit'])){
-            $this->Plugin_Run();
+            self::Plugin_Run();
         }
     }
 
-    private function Validate_Data($firstname, $lastname, $email){
+    private function Validate_Data($first_name, $last_name, $e_mail){
         global $form_error;
         $form_error = new WP_Error();
 
-        if (empty($firstname) || empty($lastname) || empty($email)){
-            $form_error -> add('field', 'Fields shouldn\'t be empty!');
+        if (empty($first_name) || empty($last_name) || empty($e_mail)){
+            $form_error -> add('field', 'Fields should not be empty!');
         }
 
-        if(filter_var($firstname, FILTER_VALIDATE_REGEXP, array("options" => array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+        if(!filter_var($first_name, FILTER_VALIDATE_REGEXP, array("options" => array("regexp"=>"/^[a-zA-Z\s]+$/")))){
             $form_error -> add('Invalid_FirstName', 'Invalid First Name Entered!');
         }
 
-        if(filter_var($lastname, FILTER_VALIDATE_REGEXP, array("options" => array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+        if(!filter_var($last_name, FILTER_VALIDATE_REGEXP, array("options" => array("regexp"=>"/^[a-zA-Z\s]+$/")))){
             $form_error -> add('Invalid_LastName', 'Invalid Last Name Entered!');
         }
 
-        if (filter_var($email,FILTER_VALIDATE_EMAIL)){
+        if (!filter_var($e_mail,FILTER_VALIDATE_EMAIL)){
             $form_error -> add('Invalid_Email','Invalid E-Mail Entered!');
         }
 
         if (is_wp_error($form_error)){
             foreach ($form_error -> get_error_messages() as $error) {
                 echo '<div>';
-                echo '<strong>ERROR</strong>';
+                echo '<strong>ERROR : </strong>';
                 echo $error. '<br/>';
                 echo '</div>';
             }
