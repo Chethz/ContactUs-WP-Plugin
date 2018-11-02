@@ -8,11 +8,9 @@
 
 defined('ABSPATH') or die('Hey, Stay away!');
 
-class Contatct_Us_Table{
-
-    function register_custom_menu_page() {
-        add_menu_page('custom menu title', 'Search Contacts', 'manage_options', 'contact_us-admin-menu', array($this,'Search_Contact_Details'), 'dashicons-search', 30);
-    }
+class Contatct_Us_Table{function register_custom_menu_page() {
+    add_menu_page('custom menu title', 'Search Contacts', 'manage_options', 'contact_us-admin-menu', array($this,'Search_Contact_Details'), 'dashicons-search', 30);
+}
 
     public function Search_Contact_Details(){
 

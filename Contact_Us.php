@@ -158,54 +158,14 @@ class Contact_Us{
             return true;
         }
     }
-
-    /** *********** WP Admin menu Functions ************* **/
-
-    function register_custom_menu_page() {
-        add_menu_page('custom menu title', 'Search Contacts', 'manage_options', 'contact_us-admin-menu', array($this,'Search_Contact_Details'), 'dashicons-search', 30);
-    }
-
-    public function Search_Contact_Details(){
-
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'contact_form';
-        $results = $wpdb->get_results("SELECT * FROM $table_name");
-        ?>
-        <div class="wrap">
-            <h2>Customer Data</h2>
-        </div>
-        <?php
-
-        if (!empty($results)){
-            echo '<table border="1">';
-            echo '<tr>';
-            echo '    <th style="width:20%;">First Name</th>';
-            echo '    <th style="width:20%;">Last Name</th>';
-            echo '   <th style="width:40%;">Email</th>';
-            echo '</tr>';
-            foreach($results as $row){
-                echo '<tr>';
-                echo "<td>".$row->first_name."</td>";
-                echo "<td>".$row->last_name."</td>";
-                echo "<td>".$row->email."</td>";
-                echo '<tr>';
-            }
-            echo '</table>';
-            }else{
-            ?>
-            <div class="wrap">
-                <h1>No record found!</h1>
-            </div>
-            <?php
-        }
-        }
-
 }
 
+include "Contact_Us_Table.php";
 if (class_exists('Contact_Us')){
     $contact_us_plugin = new Contact_Us();
+    $contact_Us_Db_Retreive = new Contatct_Us_Table();
     add_shortcode('Contact_Us_Form',array('Contact_Us','Create_HTML_Form'));
-    add_action('admin_menu', array($contact_us_plugin,'register_custom_menu_page'));
+    add_action('admin_menu', array($contact_Us_Db_Retreive,'register_custom_menu_page'));
 }
 
 
